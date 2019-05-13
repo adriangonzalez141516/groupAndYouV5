@@ -264,6 +264,19 @@ public class Inicios {
 			});
 			panels.add(crearDebates);
 			btnNewButton_1.setText("Tests");
+			JButton gestionDebates = new JButton("Gestionar debates");
+			crearDebates.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+
+					panel_1.removeAll();
+
+					panel_1.add(new gestionDebate(frame,iniciado), BorderLayout.CENTER);
+					panel_1.setVisible(false);
+					panel_1.setVisible(true);
+
+				}
+			});
+			panels.add(crearDebates);
 
 			btnNewButton_1.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {

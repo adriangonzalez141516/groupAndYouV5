@@ -585,6 +585,32 @@ public class gestionBase {
 
 		return mensajes;
 	}
+	protected ArrayList<JLabel> conseguirDebates(int nombre) {
+		ArrayList<JLabel> mensajes = new ArrayList();
+
+		try {
+			conexion = new Conexion();
+			Connection con = conexion.getConnection();
+
+			Statement st = con.createStatement();
+
+			ResultSet rs = st.executeQuery("SELECT * FROM `debates` WHERE `codigoPersona_Aux`=" + nombre);
+
+			while (rs.next()) {
+
+				mensajes.add(new JLabel(rs.getString("nombreDebate")));
+
+			}
+			st.close();
+			rs.close();
+			con.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return mensajes;
+	}
 
 	protected ArrayList<JLabel> conseguirPreguntas(String nombre) {
 		int codigo = conseguirCodigoTest(nombre);
