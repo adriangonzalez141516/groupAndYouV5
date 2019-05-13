@@ -29,7 +29,7 @@ public class gestionTests extends JPanel {
 		panelN.setLayout(new GridLayout(10, 1, 10, 20));
 		panelN.setBackground(Color.DARK_GRAY);
 		panelN.setBorder(BorderFactory.createEmptyBorder(10, 100, 10, 100));
-		array = ges.conseguirTest(1);
+		array = ges.conseguirTest(ini.getCodigoCorreo());
 
 		insertar();
 		panel.add(panelN, BorderLayout.CENTER);
