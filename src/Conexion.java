@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public class Conexion {
 	
-	private String servidor = "jdbc:mysql://localhost/trabajo3v3";
+	private String servidor = "jdbc:mysql://localhost/basededatos";
 	private String user ="root";
 	private String pass = "";
 	private String driver = "com.mysql.jdbc.Driver";
