@@ -25,6 +25,7 @@ public class gestionDebate extends JPanel {
 	iniciado ini;
 
 	public gestionDebate(JFrame a, iniciado ini) {
+		System.out.println("asdasd");
 		this.ini = ini;
 		setLayout(new BorderLayout(0, 0));
 		panel.setLayout(new BorderLayout(0, 0));
@@ -86,27 +87,29 @@ public class gestionDebate extends JPanel {
 
 				@Override
 				public void mouseClicked(MouseEvent arg0) {
-					panel.removeAll();
-					panelDebates deb=new panelDebates(ini,a);
-					
-					
+
+					System.out.println("a");
+
 					try {
 
-						Socket misocket = new Socket("192.168.4.155", 9999);
+						Socket misocket = new Socket("192.168.4.232", 9999);
 						ObjectOutputStream paquete_datoss = new ObjectOutputStream(misocket.getOutputStream());
 
 						paquete_datoss.writeObject(new online());
 
 						paquete_datoss.close();
 						misocket.close();
+						panel.removeAll();
+						panelDebates deb = new panelDebates(ini, a);
+						deb.add(new panelDebate(titulo.getText(), ini, a));
+						panel.add(deb, BorderLayout.CENTER);
+						panel.setVisible(false);
+						panel.setVisible(true);
 
-						deb.add(new panelDebate(titulo.getText(), ini, a), BorderLayout.CENTER);
-						panel.add(deb,BorderLayout.CENTER);
-						
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
-						JOptionPane.showMessageDialog(a, "EL Servidor Esta En Mantenimiento Pruebe Mas Tarde", "Error 404",
-								JOptionPane.WARNING_MESSAGE);
+						JOptionPane.showMessageDialog(a, "EL Servidor Esta En Mantenimiento Pruebe Mas Tarde",
+								"Error 404", JOptionPane.WARNING_MESSAGE);
 					}
 
 				}

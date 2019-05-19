@@ -43,13 +43,15 @@ public class panelDebates extends JPanel {
 		botones = ges.conseguirBotonesDebates();
 
 		for (JButton b : botones) {
+		
 
 			b.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					panelDebates.removeAll();
+					
 					try {
 
-						Socket misocket = new Socket("192.168.4.155", 9999);
+						Socket misocket = new Socket("192.168.4.232", 9999);
 						ObjectOutputStream paquete_datoss = new ObjectOutputStream(misocket.getOutputStream());
 
 						paquete_datoss.writeObject(new online());

@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.*;
 
@@ -27,6 +29,25 @@ public class gestionBase {
 	 * 
 	 * }
 	 */
+
+	protected void actualizarPersona(String correo, String clave, String usuario) {
+		conexion = new Conexion();
+		Connection con = conexion.getConnection();
+		Statement st = null;
+
+		String sql = "UPDATE `persona` SET `correoElectronico`='" 
+		+ correo + "',`contraseña`='"+clave+"' WHERE `nombreUsuario`='"+usuario+"'";
+
+		try {
+			st = con.createStatement();
+			st.executeUpdate(sql);
+
+		} catch (SQLException i) {
+			System.out.println("mal");
+			i.printStackTrace();
+
+		}
+	}
 
 	protected int conseguirCodigoPregunta(String titulo, String pregunta) {
 		int numero = 0;
@@ -88,6 +109,154 @@ public class gestionBase {
 
 	}
 
+	protected boolean correoRegistrado(String usuario) {
+		boolean bien = false;
+		String sql;
+		try {
+
+			conexion = new Conexion();
+			Connection con = conexion.getConnection();
+
+			Statement st = con.createStatement();
+
+			sql = "SELECT * FROM `persona` WHERE `correoElectronico`='" + usuario + "'";
+
+			ResultSet rs = st.executeQuery(sql);
+
+			while (rs.next()) {
+				bien = true;
+
+			}
+			rs.close();
+			st.close();
+			con.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return bien;
+
+	}
+
+	protected boolean usuarioRegistrado(String usuario) {
+		boolean bien = false;
+		String sql;
+		try {
+
+			conexion = new Conexion();
+			Connection con = conexion.getConnection();
+
+			Statement st = con.createStatement();
+
+			sql = "SELECT * FROM `persona` WHERE `nombreUsuario`='" + usuario + "'";
+
+			ResultSet rs = st.executeQuery(sql);
+
+			while (rs.next()) {
+				bien = true;
+
+			}
+			rs.close();
+			st.close();
+			con.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return bien;
+
+	}
+
+	protected boolean nifRegistrado(String usuario) {
+		boolean bien = false;
+		String sql;
+		try {
+
+			conexion = new Conexion();
+			Connection con = conexion.getConnection();
+
+			Statement st = con.createStatement();
+
+			sql = "SELECT * FROM `persona` WHERE `dni`='" + usuario + "'";
+
+			ResultSet rs = st.executeQuery(sql);
+
+			while (rs.next()) {
+				bien = true;
+
+			}
+			rs.close();
+			st.close();
+			con.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return bien;
+
+	}
+
+	protected boolean comprobarCorreo(String correo) {
+		Pattern pattern = Pattern.compile(
+				"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+		Matcher mather = pattern.matcher(correo);
+		return mather.find();
+	}
+
+	protected String conseguirCorreo(String usuario) {
+		String este = "";
+		String sql;
+
+		if (comprobarCorreo(usuario)) {
+			try {
+
+				conexion = new Conexion();
+				Connection con = conexion.getConnection();
+
+				Statement st = con.createStatement();
+
+				sql = "SELECT `correoElectronico` FROM `persona` WHERE `correoElectronico`='" + usuario + "'";
+
+				ResultSet rs = st.executeQuery(sql);
+
+				while (rs.next()) {
+					este = rs.getString("correoElectronico");
+				}
+				rs.close();
+				st.close();
+				con.close();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		} else {
+
+			try {
+
+				conexion = new Conexion();
+				Connection con = conexion.getConnection();
+
+				Statement st = con.createStatement();
+
+				sql = "SELECT `correoElectronico` FROM `persona` WHERE `nombreUsuario`='" + usuario + "'";
+
+				ResultSet rs = st.executeQuery(sql);
+
+				while (rs.next()) {
+					este = rs.getString("correoElectronico");
+				}
+				rs.close();
+				st.close();
+				con.close();
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return este;
+
+	}
+
 	protected iniciado conseguirPersona(int codigo) {
 		iniciado ini = null;
 
@@ -122,6 +291,28 @@ public class gestionBase {
 		puede = true;
 		String sql = "INSERT INTO `respuesta`(`codigoPersona_Aux`, `codigoPregunta_Aux`, `respuesta`) VALUES ("
 				+ codigoIniciado + "," + codigo + ",'" + respuesta + "')";
+		try {
+			st = con.createStatement();
+			st.executeUpdate(sql);
+
+		} catch (SQLException e) {
+			System.out.println("mal");
+			e.printStackTrace();
+
+		}
+	}
+
+	protected void registrarse(iniciado ini) {
+
+		conexion = new Conexion();
+		boolean puede = true;
+		Connection con = conexion.getConnection();
+		Statement st;
+
+		puede = true;
+		String sql = "INSERT INTO `persona`(`nombre`, `apellidos`, `nombreUsuario`, `correoElectronico`, `dni`, `contraseña`) VALUES ('"
+				+ ini.getNombre() + "','" + ini.getApellidos() + "','" + ini.getUsuario() + "','" + ini.getCorreo()
+				+ "','" + ini.getNif() + "','" + ini.getContraseña() + "')";
 		try {
 			st = con.createStatement();
 			st.executeUpdate(sql);
@@ -183,7 +374,6 @@ public class gestionBase {
 			e.printStackTrace();
 
 		}
-
 
 	}
 
@@ -315,29 +505,52 @@ public class gestionBase {
 
 	}
 
-	protected void insertarPreguntas(String titulo, ArrayList<pregunta> preguntas, iniciado ini) {
+	protected boolean insertarPreguntas(String titulo, ArrayList<pregunta> preguntas, iniciado ini) {
 		conexion = new Conexion();
+		boolean hey = false;
 		Connection con = conexion.getConnection();
 		Statement st = null;
 		int numero = buscarEncuestas(titulo);
 
 		for (pregunta e : preguntas) {
 			if (!e.respuesta().getText().equals("")) {
-				String sql = "INSERT INTO `preguntas`(`pregunta`, `codigoTest_Aux`, `codigoPersona_Aux`) VALUES ('"
-						+ e.respuesta().getText() + "'," + numero + "," + ini.getCodigoCorreo() + ")";
-				try {
-					st = con.createStatement();
-					st.executeUpdate(sql);
+				if (e.respuesta().superaMaximo()) {
+					String sql = "INSERT INTO `preguntas`(`pregunta`, `codigoTest_Aux`, `codigoPersona_Aux`) VALUES ('"
+							+ e.respuesta().getText() + "'," + numero + "," + ini.getCodigoCorreo() + ")";
+					try {
+						st = con.createStatement();
+						st.executeUpdate(sql);
 
-				} catch (SQLException i) {
-					System.out.println("mal");
-					i.printStackTrace();
+					} catch (SQLException i) {
+						System.out.println("mal");
+						i.printStackTrace();
 
+					}
+				} else {
+					hey = true;
 				}
 			}
 
 		}
+		return hey;
+	}
 
+	protected void actualizarContra(String correo, String clave) {
+		conexion = new Conexion();
+		Connection con = conexion.getConnection();
+		Statement st = null;
+
+		String sql = "UPDATE `persona` SET `contraseña`='" + clave + "' WHERE `correoElectronico`='" + correo + "'";
+
+		try {
+			st = con.createStatement();
+			st.executeUpdate(sql);
+
+		} catch (SQLException i) {
+			System.out.println("mal");
+			i.printStackTrace();
+
+		}
 	}
 
 	protected void actualizarPreguntas(String titulo, ArrayList<pregunta1> preguntas) {
@@ -440,9 +653,10 @@ public class gestionBase {
 					"SELECT `codigoPersona_Aux`,`mensaje` FROM `debatir` WHERE codigoDebate_Aux=" + codigo);
 
 			while (rs.next()) {
+				mensaje men = new mensaje(new JLabel(rs.getString("mensaje")),
+						conseguirPersona(rs.getInt("codigoPersona_Aux")).getUsuario());
 
-				mensajes.add(new mensaje(new JLabel(rs.getString("mensaje")),
-						conseguirPersona(rs.getInt("codigoPersona_Aux")).getUsuario()));
+				mensajes.add(men);
 
 			}
 			rs.close();
@@ -585,6 +799,7 @@ public class gestionBase {
 
 		return mensajes;
 	}
+
 	protected ArrayList<JLabel> conseguirDebates(int nombre) {
 		ArrayList<JLabel> mensajes = new ArrayList();
 

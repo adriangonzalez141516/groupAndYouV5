@@ -6,7 +6,7 @@ import javax.swing.JPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Label;
-import javax.swing.JTextField;
+import javax.swing.*;
 import java.awt.Font;
 import java.awt.Graphics;
 
@@ -19,7 +19,7 @@ import javax.swing.SwingConstants;
 public class prueba {
 
 	private JFrame frame;
-	private JTextField textField;
+	private myTextField textField;
 	private Label label_1;
 	private JPasswordField passwordField;
 	private JPanel panel_1;
@@ -67,7 +67,7 @@ public class prueba {
 		label.setBounds(124, 304, 388, 24);
 		panel.add(label);
 
-		textField = new JTextField();
+		textField = new myTextField();
 		textField.setHorizontalAlignment(SwingConstants.CENTER);
 		textField.setToolTipText("k");
 		textField.setBounds(140, 353, 388, 22);

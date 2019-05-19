@@ -18,6 +18,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import javax.sound.midi.Synthesizer;
 import javax.swing.*;
 
 public class panelDebate extends JPanel implements Runnable {
@@ -36,7 +37,7 @@ public class panelDebate extends JPanel implements Runnable {
 		this.titulos = titulos;
 		System.out.println(titulos);
 		this.puerto = ges.conseguirPuerto(titulos);
-		JOptionPane.showMessageDialog(null, puerto);
+
 		setLayout(new BorderLayout(0, 0));
 		titulo = new JLabel(titulos);
 
@@ -48,20 +49,24 @@ public class panelDebate extends JPanel implements Runnable {
 
 		titulo.setHorizontalAlignment(SwingConstants.CENTER);
 		titulo.setFont(new Font("Dialog", Font.PLAIN, 28));
-		System.out.println("lkjh");
+
 		insertarMensajes(titulos);
-		System.out.println("asdasd");
+
 		add(scrollPane, BorderLayout.CENTER);
 		add(titulo, BorderLayout.NORTH);
-		System.out.println("asdfg");
+
 		insertarBotonEnviar();
 		setVisible(true);
 
 		Socket envia_destinatario;
 		try {
-			envia_destinatario = new Socket("192.168.4.155", 9999);
+
+			envia_destinatario = new Socket("192.168.4.232", 9999);
+
 			ObjectOutputStream paqueteReenvio = new ObjectOutputStream(envia_destinatario.getOutputStream());
+
 			paqueteReenvio.writeObject(new mensaje(null, null));
+
 			paqueteReenvio.close();
 			envia_destinatario.close();
 		} catch (UnknownHostException e) {
@@ -77,39 +82,47 @@ public class panelDebate extends JPanel implements Runnable {
 
 	}
 
+	private ServerSocket servidor_cliente;
+
 	public void run() {
+		boolean hey = false;
+		do {
+			try {
 
-		try {
+				if (!hey) {
+					servidor_cliente = new ServerSocket(puerto);
+					hey = false;
 
-			ServerSocket servidor_cliente = new ServerSocket(puerto);
-			Socket cliente;
-
-			while (true) {
-
-				cliente = servidor_cliente.accept();
-				ObjectInputStream flujoentrada = new ObjectInputStream(cliente.getInputStream());
-
-				try {
-
-					insertarMensajes(titulo.getText());
-					notificar a = new notificar();
-					mensaje men = (mensaje) flujoentrada.readObject();
-					a.displayTray(men.getPersona() + ": " + men.getMesaje().getText());
-					flujoentrada.close();
-					cliente.close();
-
-				} catch (MalformedURLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (AWTException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
 				}
+				Socket cliente;
+				while (true) {
+
+					cliente = servidor_cliente.accept();
+					ObjectInputStream flujoentrada = new ObjectInputStream(cliente.getInputStream());
+
+					try {
+
+						insertarMensajes(titulo.getText());
+						notificar a = new notificar();
+						mensaje men = (mensaje) flujoentrada.readObject();
+						a.displayTray(men.getPersona() + ": " + men.getMesaje().getText());
+						flujoentrada.close();
+						cliente.close();
+
+					} catch (MalformedURLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (AWTException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+				}
+			} catch (Exception e) {
+				hey = true;
 
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} while (hey);
 
 	}
 
@@ -124,7 +137,6 @@ public class panelDebate extends JPanel implements Runnable {
 		ArrayList<mensaje> mensajes;
 
 		mensajes = ges.conseguirMensajes(titulos);
-		System.out.println("poste");
 
 		for (mensaje l : mensajes) {
 
@@ -153,16 +165,18 @@ public class panelDebate extends JPanel implements Runnable {
 	class panelSur extends JPanel {
 
 		private JButton enviar = new JButton("enviar");
-		private JTextField mensaje = new JTextField();
+		private myTextField mensaje = new myTextField();
 
 		public panelSur() {
+			mensaje.setMaximo(99);
 			setLayout(new BorderLayout(0, 0));
 
 			enviar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+
 					gestionBase ges = new gestionBase();
 					try {
-						Socket misocket = new Socket("192.168.4.155", 9999);
+						Socket misocket = new Socket("192.168.4.232", 9999);
 						ObjectOutputStream paquete_datoss = new ObjectOutputStream(misocket.getOutputStream());
 
 						paquete_datoss.writeObject(new online());
@@ -176,22 +190,31 @@ public class panelDebate extends JPanel implements Runnable {
 					}
 
 					if (!mensaje.getText().equals("")) {
-						ges.enviarRespuesta(ini.getCodigoCorreo(), titulo.getText(), mensaje.getText());
-						try {
-							Socket misocket = new Socket("192.168.4.155", 9999);
-							ObjectOutputStream paquete_datoss = new ObjectOutputStream(misocket.getOutputStream());
-							mensaje men = new mensaje(new JLabel(mensaje.getText()), ini.getUsuario());
-							men.setPuerto(puerto);
-							paquete_datoss.writeObject(men);
+						if (mensaje.superaMaximo()) {
 
-							mensaje.setText("");
-							paquete_datoss.close();
-							misocket.close();
-						} catch (UnknownHostException e1) {
-							System.out.println("host desconocido");
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
+							ges.enviarRespuesta(ini.getCodigoCorreo(), titulo.getText(), mensaje.getText());
+							try {
+								Socket misocket = new Socket("192.168.4.232", 9999);
+								ObjectOutputStream paquete_datoss = new ObjectOutputStream(misocket.getOutputStream());
+								mensaje men = new mensaje(new JLabel(mensaje.getText()), ini.getUsuario());
+								men.setPuerto(puerto);
+								paquete_datoss.writeObject(men);
 
+								mensaje.setText("");
+								paquete_datoss.close();
+								misocket.close();
+							} catch (UnknownHostException e1) {
+								System.out.println("host desconocido");
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								JOptionPane.showMessageDialog(frame,
+										"EL servidor Esta En Mantenimiento Pruebe Mas Tarde", "Error 404",
+										JOptionPane.WARNING_MESSAGE);
+
+							}
+						} else {
+							JOptionPane.showMessageDialog(frame, "El Mensaje Supera la longitud maxima (99)",
+									"Error en el mensaje", JOptionPane.WARNING_MESSAGE);
 						}
 					}
 				}
@@ -208,7 +231,7 @@ public class panelDebate extends JPanel implements Runnable {
 
 			try {
 
-				Socket misocket = new Socket("192.168.4.155", 9909);
+				Socket misocket = new Socket("192.168.4.232", 9909);
 				String thisIp = InetAddress.getLocalHost().getHostAddress();
 				ObjectOutputStream paquete_datos = new ObjectOutputStream(misocket.getOutputStream());
 				paquete_datos.writeUTF(thisIp);

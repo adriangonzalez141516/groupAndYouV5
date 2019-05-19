@@ -2,6 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Dell/Desktop/mysql-connector-java-5.1.47/mysql-connector-java-5.1.47/mysql-connector-java-5.1.47-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/adria/Desktop/Nueva carpeta (2)/ya/mysql-connector-java-5.1.47/mysql-connector-java-5.1.47-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Users/adria/Desktop/Nueva carpeta (2)/javax.mail.jar"/>
+	<classpathentry kind="lib" path="C:/Users/adria/Desktop/hoy/RSProgressBar.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

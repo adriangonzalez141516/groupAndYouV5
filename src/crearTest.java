@@ -20,7 +20,7 @@ public class crearTest extends JPanel {
 	iniciado ini;
 
 	public crearTest(JFrame frame, iniciado ini) {
-		this.ini=ini;
+		this.ini = ini;
 		JScrollPane scrollPane = new JScrollPane();
 		this.frame = frame;
 		panelN.setLayout(new GridLayout(10, 1, 10, 10));
@@ -57,9 +57,10 @@ public class crearTest extends JPanel {
 
 	class panelNor extends JPanel {
 		private JLabel nombre = new JLabel("Introduce el titulo");
-		private JTextField res = new JTextField();
+		private myTextField res = new myTextField();
 
 		public panelNor() {
+			res.setMaximo(99);
 			setLayout(new GridLayout(1, 2, 10, 10));
 			nombre.setHorizontalAlignment(SwingConstants.CENTER);
 			nombre.setFont(new Font("Dialog", Font.PLAIN, 28));
@@ -77,6 +78,11 @@ public class crearTest extends JPanel {
 
 		}
 
+		protected boolean puede() {
+
+			return res.superaMaximo();
+		}
+
 	}
 
 	class panelSurs extends JPanel {
@@ -86,6 +92,7 @@ public class crearTest extends JPanel {
 			añadir.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					pregunta p = new pregunta();
+
 					preguntas.add(p);
 					if (preguntas.size() > actual) {
 						actual++;
@@ -110,19 +117,29 @@ public class crearTest extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 
 					gestionBase ges = new gestionBase();
-					if (ges.crearEncuesta(p.getTitulo(), ini)) {
-						ges.insertarPreguntas(p.getTitulo(), preguntas, ini);
-						JOptionPane.showMessageDialog(frame, "Test Creado Con exito");
-						
+					if (p.puede()) {
+						if (ges.crearEncuesta(p.getTitulo(), ini)) {
+							if (ges.insertarPreguntas(p.getTitulo(), preguntas, ini)) {
+								JOptionPane.showMessageDialog(frame,
+										"Alguna pregunta supera la longituz maxima(99)\nPero se han insertado las que estan bien",
+										"Alerta", JOptionPane.WARNING_MESSAGE);
+							} else {
+								JOptionPane.showMessageDialog(frame, "Test Creado Con exito");
+							}
+
+						} else {
+							JOptionPane.showMessageDialog(frame, "EL TEST YA EXISTE", "Alerta",
+									JOptionPane.WARNING_MESSAGE);
+						}
+
+						for (pregunta pregunta : preguntas) {
+							pregunta.setRespuesta("");
+						}
+
 					} else {
-						JOptionPane.showMessageDialog(frame, "EL TEST YA EXISTE", "Alerta",
+						JOptionPane.showMessageDialog(frame, "El titulo supera la longituz maxima(99)", "Alerta",
 								JOptionPane.WARNING_MESSAGE);
 					}
-					
-					for (pregunta pregunta : preguntas) {
-						pregunta.setRespuesta("");
-					}
-
 				}
 			});
 			add(enviar);
@@ -135,7 +152,7 @@ public class crearTest extends JPanel {
 			borrar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					if (preguntas.size() >= 1) {
-						preguntas.remove(preguntas.size()-1);
+						preguntas.remove(preguntas.size() - 1);
 						panelN.remove(preguntas.size());
 						actual--;
 						if (actual >= 10) {
@@ -162,10 +179,11 @@ public class crearTest extends JPanel {
 
 class pregunta extends JPanel {
 	private JLabel pregunta = new JLabel("Introduce una pregunta");
-	private JTextField respuesta = new JTextField();
+	private myTextField respuesta = new myTextField();
 
 	public pregunta() {
 		setBackground(Color.DARK_GRAY);
+		respuesta.setMaximo(99);
 		pregunta.setForeground(Color.WHITE);
 		pregunta.setHorizontalAlignment(SwingConstants.CENTER);
 		pregunta.setFont(new Font("Dialog", Font.PLAIN, 28));
@@ -176,7 +194,7 @@ class pregunta extends JPanel {
 		setVisible(true);
 	}
 
-	protected JTextField respuesta() {
+	protected myTextField respuesta() {
 		return respuesta;
 	}
 

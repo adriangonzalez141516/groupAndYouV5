@@ -61,7 +61,7 @@ public class actualizarTest extends JPanel {
 
 	class panelNor1 extends JPanel {
 		private JLabel nombre = new JLabel("Introduce el titulo");
-		private JTextField res = new JTextField();
+		private myTextField res = new myTextField();
 
 		public panelNor1() {
 			setLayout(new GridLayout(1, 2, 10, 10));
@@ -163,7 +163,7 @@ public class actualizarTest extends JPanel {
 
 class pregunta1 extends JPanel {
 	private JLabel pregunta = new JLabel("Introduce una pregunta");
-	private JTextField respuesta = new JTextField();
+	private myTextField respuesta = new myTextField();
 
 	public pregunta1() {
 		setBackground(Color.DARK_GRAY);

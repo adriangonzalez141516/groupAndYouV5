@@ -17,7 +17,7 @@ public class panelTest extends JPanel {
 	public panelTest(String titulos, JFrame frame, iniciado ini) {
 		JScrollPane scrollPane = new JScrollPane();
 		this.frame = frame;
-		this.ini=ini;
+		this.ini = ini;
 
 		setLayout(new BorderLayout(0, 0));
 		titulo = new JLabel(titulos);
@@ -41,21 +41,32 @@ public class panelTest extends JPanel {
 		JButton enviar = new JButton("Enviar");
 		enviar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean problem = false;
 				int codigo = 0;
 				int numero = 0;
 				String mensaje;
 				for (panelMensajess p : panel) {
 					mensaje = p.getRespuesta();
 
-					if (!mensaje.equals("")) {
-						numero++;
-						codigo = ges.conseguirCodigoPregunta(titulo.getText(), p.getMensaje());
-						ges.responder(codigo, p.getRespuesta(), ini.getCodigoCorreo());
-						p.borrarRespuesta();
+					if (p.noApto()) {
 
+						if (!mensaje.equals("")) {
+							numero++;
+							codigo = ges.conseguirCodigoPregunta(titulo.getText(), p.getMensaje());
+							ges.responder(codigo, p.getRespuesta(), ini.getCodigoCorreo());
+							p.borrarRespuesta();
+
+						}
+					} else {
+						problem = true;
 					}
 
 				}
+				if (problem) {
+					JOptionPane.showMessageDialog(frame, "Hay algunas preguntas que superan los valores maximos(99)",
+							"Supera la longituz maxima", JOptionPane.WARNING_MESSAGE);
+				}
+
 				if (numero > 0) {
 					JOptionPane.showMessageDialog(frame, "Gracias por participar");
 				} else {
@@ -97,10 +108,11 @@ public class panelTest extends JPanel {
 class panelMensajess extends JPanel {
 
 	private JLabel mensaje;
-	private JTextField respuesta = new JTextField();
+	private myTextField respuesta = new myTextField();
 
 	public panelMensajess(JLabel m) {
 		setLayout(new BorderLayout(0, 0));
+		respuesta.setMaximo(99);
 		this.mensaje = m;
 		respuesta.setVisible(true);
 		add(mensaje, BorderLayout.NORTH);
@@ -119,6 +131,10 @@ class panelMensajess extends JPanel {
 
 	protected String getRespuesta() {
 		return respuesta.getText();
+	}
+
+	protected boolean noApto() {
+		return respuesta.superaMaximo();
 	}
 
 }
